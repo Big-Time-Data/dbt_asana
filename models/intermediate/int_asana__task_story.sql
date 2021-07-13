@@ -98,9 +98,11 @@ parse_actions as (
         when action_description like '{{key}}' then '{{value}}' 
         {%- endfor %}
         else action_description end as action_taken,
-        action_description
+        action_description,
+        sum (len(comment_content)) over (partition by target_task_id order by created_at asc rows unbounded preceding) as rolling_comment_size
     
     from split_comments
+    where action_taken is not null and rolling_comment_size <= 10000
 
 ),
 
