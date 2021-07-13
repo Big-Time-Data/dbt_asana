@@ -102,7 +102,6 @@ parse_actions as (
         sum (len(comment_content)) over (partition by target_task_id order by created_at asc rows unbounded preceding) as rolling_comment_size
     
     from split_comments
-    where action_taken is not null and rolling_comment_size <= 10000
 
 ),
 
@@ -113,7 +112,7 @@ final as (
     from parse_actions
 
     -- remove actions you don't care about (set to null in the actions dictionary above)
-    where action_taken is not null 
+    where action_taken is not null and rolling_comment_size <= 10000
 
 )
 
